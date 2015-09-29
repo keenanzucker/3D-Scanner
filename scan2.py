@@ -18,6 +18,7 @@ ser = serial.Serial(port,frequency)
 xs = []
 ys = []
 zs = []
+d = []
 
 points = []
 output = []
@@ -26,40 +27,41 @@ for i in range(0,200):
 	points.append(ser.readline().split(' ')[:3])
 
 def removeBuffer(rawPoints):
+	beginning = 0
 	for j in range(0,len(rawPoints)):
 		for k in range(0, len(rawPoints[j])):
-			if rawPoints[j][0] == '0':
-				if rawPoints[j][1] == '60':
+			if rawPoints[j][0] == '-30':			# Wherever pan is starting
+				if rawPoints[j][1] == '100':		# Wherever tilt is starting
 					beginning = j
 	rawPoints = rawPoints[beginning:]
 
 	return rawPoints
 
 points = removeBuffer(points)
+#print points
 
 for a in points:
 	xs.append(float(a[0]))
 	ys.append(float(a[1]))
-	zs.append(re.findall("\d+.\d+", a[2]))
+	d.append(re.findall("\d+.\d+", a[2]))
 
-zs = [y for x in zs for y in x]
+d = [y for x in d for y in x]
 
-for b in range(0,len(zs)):
-	zs[b] = float(zs[b])
-
-# for h in points:
-
-# 	xcord = float(h[2]) * math.sin(math.radians(float(h[0])))
-
-# 	ycord = float(h[2]) * math.sin(math.radians(float(h[1])))
-
-# 	xs.append(float(xcord))
-# 	ys.append(float(ycord))
-# 	zs.append(float(h[2]))
+for b in range(0,len(d)):
+	d[b] = float(d[b])
 
 print xs
 print ys
-print zs
+print d
+
+for c in range(0,len(xs)):
+
+	zs[c] = d[c] * math.cos(math.radians(xs[c]))
+
+	xs[c] = d[c] * math.sin(math.radians(xs[c]))
+
+	ys[c] = d[c] * math.sin(math.radians(ys[c]))
+
 
 fig = pylab.figure()
 ax = Axes3D(fig)
